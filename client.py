@@ -1,25 +1,34 @@
-import pygame
+# client_day1.py
+import socket
 
-pygame.init()
-screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Snake Multiplayer - UI Test (Day 1)")
+class Client:
+    def __init__(self, host="127.0.0.1", port=9009):
+        self.host = host
+        self.port = port
+        self.sock = None
 
-clock = pygame.time.Clock()
+    def connect(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.host, self.port))
+        print("[client] Connected to server")
 
-snake = pygame.Rect(100, 100, 20, 20)
+    def send(self, data: str):
+        if self.sock:
+            self.sock.sendall(data.encode("utf-8"))
 
-running = True
-while running:
-    screen.fill((0, 0, 0))
+    def receive(self):
+            data = self.sock.recv(1024).decode("utf-8")
+            print("[server]", data)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    def close(self):
+        if self.sock:
+            self.sock.close()
+            print("[client] Disconnected")
 
-    pygame.draw.rect(screen, (0, 255, 0), snake)
 
-    pygame.display.update()
-    clock.tick(10)
-
-pygame.quit()
-
+if __name__ == "__main__":
+    client = Client()
+    client.connect()
+    client.send("Hello server!")
+    client.receive()
+    client.close()
