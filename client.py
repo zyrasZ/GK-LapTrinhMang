@@ -1,3 +1,4 @@
+
 import socket
 import json
 
@@ -40,3 +41,23 @@ if __name__ == "__main__":
     client.send_command({"type": "input", "action": "move", "dir": "UP"})
     client.receive()
     client.close()
+class GameClient(Client):
+    def send_dead(self):
+        self.send_command({"type": "dead"})
+
+    def send_respawn(self):
+        self.send_command({"type": "respawn"})
+
+if __name__ == "__main__":
+    c = GameClient(name="player4")
+    c.connect()
+    while True:
+        cmd = input("Command (w/a/s/d/r/q): ").lower()
+        if cmd == "q":
+            break
+        elif cmd == "r":
+            c.send_respawn()
+        elif cmd in "wasd":
+            dirs = {"w":"UP","a":"LEFT","s":"DOWN","d":"RIGHT"}
+            c.send_command({"type":"input","dir":dirs[cmd]})
+    c.close()
